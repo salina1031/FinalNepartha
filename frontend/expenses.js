@@ -1,6 +1,13 @@
 // API Base URL
 const API_URL = 'http://localhost:5000/api';
 
+// Logout function — ADDED (was missing, causing Logout button to break)
+function logout() {
+    localStorage.removeItem('nepartha_session');
+    sessionStorage.removeItem('nepartha_session');
+    window.location.href = 'login.html';
+}
+
 // Category Colors
 const categoryColors = {
     'Food': '#FF6384',
@@ -64,12 +71,10 @@ function filterAndDisplayExpenses() {
 
     let filteredExpenses = allExpenses;
 
-    // Filter by category
     if (categoryFilter !== 'all') {
         filteredExpenses = filteredExpenses.filter(exp => exp.category === categoryFilter);
     }
 
-    // Filter by month
     if (monthFilter !== 'all') {
         filteredExpenses = filteredExpenses.filter(exp => {
             const expDate = new Date(exp.date);
@@ -92,14 +97,11 @@ function displayExpenses(expenses) {
         return;
     }
 
-    // Sort by date (most recent first)
     expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Calculate total
     const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
     totalAmount.textContent = `NPR ${total.toFixed(2)}`;
 
-    // Display expenses
     tbody.innerHTML = expenses.map(exp => `
         <tr>
             <td>${new Date(exp.date).toLocaleDateString()}</td>
@@ -125,7 +127,7 @@ function editExpense(id) {
     window.location.href = `addExpenses.html?edit=${id}`;
 }
 
-// Show delete confirmation modal
+// Show delete confirmation modal — FIXED: display flex so modal-overlay works
 function showDeleteModal(id) {
     deleteExpenseId = id;
     document.getElementById('deleteModal').style.display = 'flex';
@@ -157,7 +159,7 @@ function closeDeleteModal() {
     deleteExpenseId = null;
 }
 
-// Language Toggle (placeholder)
+// Language Toggle
 function setupLangToggle() {
     document.getElementById('langToggle').addEventListener('click', function () {
         const currentLang = this.textContent;
@@ -175,8 +177,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('filterCategory').addEventListener('change', filterAndDisplayExpenses);
     document.getElementById('filterMonth').addEventListener('change', filterAndDisplayExpenses);
-
-    // FIX: "confirmDeleteBtn" — HTML ma pani same id rakhnuhos (tala hernus)
     document.getElementById('confirmDeleteBtn').addEventListener('click', deleteExpense);
     document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
 
