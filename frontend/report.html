@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NepArtha - Reports</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>नेपअर्थ (NepArtha)</h1>
+                <p>Expense Management System</p>
+            </div>
+            <div class="nav-actions">
+                <button id="langToggle" class="btn-secondary">नेपाली</button>
+
+                <button onclick="logout()" class="btn-danger btn-small">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu -->
+    <div class="menu">
+        <a href="index.html" class="menu-item">Dashboard</a>
+        <a href="addExpenses.html" class="menu-item">Add Expense</a>
+        <a href="expenses.html" class="menu-item">Expenses</a>
+        <a href="report.html" class="menu-item active">Reports</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2 class="page-title">Financial Reports</h2>
+<!-- eutai card ma bana ko same css for the addExpenses.html card for consistency -->
+        <div class="form-card">
+
+            <!-- Budget Setting -->
+            <div class="section">
+                <h3 class="section-title">Set Monthly Budget</h3>
+                <div class="budget-setting">
+                    <input type="number" id="budgetInput" placeholder="Enter budget amount" step="100">
+                    <button id="saveBudget" class="btn-primary">Save Budget</button>
+                </div>
+                <p id="budgetMsg" class="info-text"></p>
+            </div>
+
+            <!-- Budget Overview -->
+            <div class="budget-overview">
+                <div class="budget-item">
+                    <span class="budget-label">Monthly Budget:</span>
+                    <span class="budget-value" id="budgetAmount">NPR 0.00</span>
+                </div>
+                <div class="budget-item">
+                    <span class="budget-label">Total Spent:</span>
+                    <span class="budget-value text-red" id="spentAmount">NPR 0.00</span>
+                </div>
+                <div class="budget-item">
+                    <span class="budget-label">Remaining:</span>
+                    <span class="budget-value" id="remainingAmount">NPR 0.00</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="section">
+                <h3 class="section-title">Category Breakdown</h3>
+                <div id="categoryBreakdown" class="category-breakdown">
+                    <p class="no-data">No data available</p>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-row">
+                <div class="chart-container">
+                    <h3 class="section-title">Spending by Category</h3>
+                    <canvas id="categoryPieChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="section-title">Monthly Comparison</h3>
+                    <canvas id="monthlyBarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="section">
+                <h3 class="section-title">Export Data</h3>
+                <div class="export-buttons">
+                    <button id="exportCSV" class="btn-secondary">📥 Export to CSV</button>
+                    <button id="printReport" class="btn-secondary">🖨️ Print Report</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="report.js"></script>
+    <script src="translations.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NepArtha - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+
+<body>
+
+ <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>नेपअर्थ (NepArtha)</h1>
+                <p>Expense Management System</p>
+            </div>
+             <span class="user-welcome">Welcome, <strong id="userName">User</strong></span>
+            <div class="nav-actions">
+                <button id="langToggle" class="btn-secondary">नेपाली</button>
+               
+                <button onclick="logout()" class="btn-danger btn-small">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu -->
+    <div class="menu">
+        <a href="index.html" class="menu-item active">Dashboard</a>
+        <a href="addExpenses.html" class="menu-item">Add Expense</a>
+        <a href="expenses.html" class="menu-item">Expenses</a>
+        <a href="report.html" class="menu-item">Reports</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="app-container">
+        <h2 class="page-title">Dashboard</h2>
+
+        <!-- Budget Warning -->
+        <div id="budgetWarning" class="alert alert-danger" style="display:none;">
+            Warning: You have exceeded your monthly budget!
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+
+            <div class="cards card-red">
+                <div class="card-icon">💰</div>
+                <div class="card-content">
+                    <p class="card-label">Total Spent</p>
+                    <h3 class="card-value" id="totalSpent">NPR 0.00</h3>
+                </div>
+            </div>
+
+            <div class="cards card-blue">
+                <div class="card-icon">📊</div>
+                <div class="card-content">
+                    <div class="budget-header">
+                        <div>
+                            <p class="card-label">Monthly Budget</p>
+                            <h3 class="card-value" id="monthlyBudget">NPR 0.00</h3>
+                        </div>
+
+                        <!-- FIXED ID -->
+                        <button id="budgetBtn" onclick="showBudgetModal()" class="btn-edit-budget">
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards card-green" id="remainingCard">
+                <div class="card-icon">💵</div>
+                <div class="card-content">
+                    <p class="card-label">Remaining</p>
+                    <h3 class="card-value" id="remaining">NPR 0.00</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-row">
+            <div class="chart-container">
+                <h3 class="section-title">Expenses by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="section-title">Monthly Trend</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="table-container">
+            <h3 class="section-title">Recent Transactions</h3>
+            <div id="recentTransactions" class="transactions-list">
+                <p class="no-data">No expenses recorded yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= BUDGET MODAL ================= -->
+    <div id="budgetModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h2 class="modal-title">Set Monthly Budget</h2>
+
+            <div class="modal-body">
+                <label class="form-label">Monthly Budget Amount (NPR)</label>
+                <input type="number"
+                       id="budgetInput"
+                       class="modal-input"
+                       placeholder="Enter your monthly budget"
+                       min="0"
+                       step="0.01">
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="hideBudgetModal()" class="btn-cancel">Cancel</button>
+                <button onclick="saveBudget()" class="btn-save">Save Budget</button>
+            </div>
+        </div>
+    </div>
+    <!-- ================================================ -->
+
+    <!-- Scripts -->
+    <script src="dashboard.js"></script>
+    <script src="translations.js"></script>
+
+</body>
+</html>

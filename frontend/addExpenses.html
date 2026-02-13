@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NepArtha - Add Expense</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>नेपअर्थ (NepArtha)</h1>
+                <p>Expense Management System</p>
+            </div>
+            <div class="nav-actions">
+                <button id="langToggle" class="btn-secondary">नेपाली</button>
+                
+                <button onclick="logout()" class="btn-danger btn-small">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu -->
+    <div class="menu">
+        <a href="index.html" class="menu-item">Dashboard</a>
+        <a href="addExpenses.html" class="menu-item active">Add Expense</a>
+        <a href="expenses.html" class="menu-item">Expenses</a>
+        <a href="report.html" class="menu-item">Reports</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2 class="page-title" id="formTitle">Add New Expense</h2>
+
+        <div class="form-container">
+            <div class="form-card">
+                <!-- Success/Error Messages -->
+                <div id="successMsg" class="alert alert-success" style="display: none;"></div>
+                <div id="errorMsg" class="alert alert-danger" style="display: none;"></div>
+
+                <!-- Expense Form -->
+                <div class="form-group">
+                    <label for="amount">Amount (NPR) *</label>
+                    <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" required>
+                        <option value="Food">🍔 Food</option>
+                        <option value="Transport">🚗 Transport</option>
+                        <option value="Education">📚 Education</option>
+                        <option value="Entertainment">🎮 Entertainment</option>
+                        <option value="Shopping">🛍️ Shopping</option>
+                        <option value="Health">🏥 Health</option>
+                        <option value="Bills">📄 Bills</option>
+                        <option value="Others">📌 Others</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" placeholder="Optional description">
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date *</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div class="form-actions">
+                    <button id="submitBtn" class="btn-primary">
+                        ➕ Add Expense
+                    </button>
+                    <button id="cancelBtn" class="btn-secondary" style="display: none;">
+                        ❌ Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="addExpenses.js"></script>
+    <script src="translations.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<title>NepArtha Sign Up</title>
+</head>
+
+<body>
+<div class="container-loginSignup">
+
+    <!-- Logo -->
+    <div class="logo">
+        <img src="logo.svg" alt="logo">
+    </div>
+
+    <!-- Card -->
+    <div class="card">
+        <h1>Sign Up</h1>
+        <div id="errorMsg" class="error-message"></div>
+        <div id="successMsg" class="success-message"></div>
+
+        <form class="loginform" id="signupForm" action="login.html">
+            <input class="input-blue" type="text" id="fullname" placeholder="Full Name" required>
+            <input class="input-pink" type="email" id="email" placeholder="Email" required>
+            <input class="input-blue" type="text" id="username" placeholder="Username" required>
+            <input class="input-pink" type="password" id="password" placeholder="Password" required>
+            <input class="input-blue" type="password" id="confirmPassword" placeholder="Confirm Password" required>
+
+            <button type="submit">Sign Up</button>
+
+            <div class="link">
+                Already have account? <a href="login.html">LogIn</a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<script src="signup.js"></script>
+</body>
+</html>
