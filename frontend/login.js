@@ -1,39 +1,69 @@
+// login.js — NepArtha v2
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+const API_URL = 'http://localhost:5000/api';
+
+// ─── Page load — fill saved username if remember me was checked ───────────────
+
+document.addEventListener('DOMContentLoaded', function () {
+    const savedUsername = localStorage.getItem('nepartha_remembered_user');
+
+    if (savedUsername) {
+        document.getElementById('username').value   = savedUsername;
+        document.getElementById('remember').checked = true;
+        document.getElementById('password').focus(); // cursor password मा
+    }
+});
+
+// ─── Login submit ─────────────────────────────────────────────────────────────
+
+document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-    
-    const username = document.getElementById('username').value;
+
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const remember = document.getElementById('remember').checked;
-    
-    const errorMsg = document.getElementById('errorMsg');
-    errorMsg.style.display = 'none';
-    
-    // Get users from localStorage
-    const users = JSON.parse(localStorage.getItem('nepartha_users') || '[]');
-    
-    // Find matching user
-    const user = users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-        // Store logged in user session
-        const session = {
-            username: user.username,
-            fullname: user.fullname,
-            email: user.email,
-            loginTime: new Date().toISOString()
-        };
-        
-        if (remember) {
-            localStorage.setItem('nepartha_session', JSON.stringify(session));
-        } else {
-            sessionStorage.setItem('nepartha_session', JSON.stringify(session));
+    const errorEl  = document.getElementById('errorMsg');
+    const btn      = this.querySelector('button[type="submit"]');
+
+    errorEl.style.display = 'none';
+    btn.textContent = 'Logging in…';
+    btn.disabled    = true;
+
+    try {
+        const res  = await fetch(`${API_URL}/auth/login`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error || 'Login failed');
         }
-        
-        // Redirect to dashboard
+
+        // Remember me — save वा clear गर्ने
+        if (remember) {
+            localStorage.setItem('nepartha_remembered_user', username);
+        } else {
+            localStorage.removeItem('nepartha_remembered_user');
+        }
+
+        // Token + session save
+        const storage = remember ? localStorage : sessionStorage;
+        storage.setItem('nepartha_token',   data.token);
+        storage.setItem('nepartha_session', JSON.stringify({
+            user_id:  data.user_id,
+            username: data.username,
+            fullname: data.fullname,
+            email:    data.email
+        }));
+
         window.location.href = 'index.html';
-    } else {
-        errorMsg.textContent = 'Invalid username or password!';
-        errorMsg.style.display = 'block';
+
+    } catch (err) {
+        errorEl.textContent   = err.message;
+        errorEl.style.display = 'block';
+        btn.textContent       = 'LogIn';
+        btn.disabled          = false;
     }
 });

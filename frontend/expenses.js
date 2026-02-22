@@ -1,120 +1,131 @@
-// API Base URL
-const API_URL = 'http://localhost:5000/api';
+// expenses.js — NepArtha v2
+// NOTE: API_URL, authFetch, initPage, logout — all from auth.js
 
-// Logout function — ADDED (was missing, causing Logout button to break)
-function logout() {
-    localStorage.removeItem('nepartha_session');
-    sessionStorage.removeItem('nepartha_session');
-    window.location.href = 'login.html';
-}
-
-// Category Colors
 const categoryColors = {
-    'Food': '#FF6384',
-    'Transport': '#36A2EB',
-    'Education': '#FFCE56',
-    'Entertainment': '#4BC0C0',
-    'Shopping': '#9966FF',
-    'Health': '#FF9F40',
-    'Bills': '#E74C3C',
-    'Others': '#95A5A6'
+    Food: '#FF6384',
+    Transport: '#36A2EB', 
+    Education: '#FFCE56',
+    Entertainment: '#4BC0C0', 
+    Shopping: '#9966FF', 
+    Health: '#FF9F40',
+    Bills: '#E74C3C', 
+    Others: '#95A5A6'
 };
 
 let allExpenses = [];
 let deleteExpenseId = null;
 
-// Load expenses
+// ─── Bootstrap ───────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function () {
+    const session = initPage(); // from auth.js
+    if (!session) return;
+
+    loadExpenses();
+
+    document.getElementById('filterCategory').addEventListener('change', filterAndDisplay);
+    document.getElementById('filterMonth').addEventListener('change', filterAndDisplay);
+    document.getElementById('confirmDeleteBtn').addEventListener('click', deleteExpense);
+    document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
+});
+
+// ─── Load ─────────────────────────────────────────────────────────────────────
+
 async function loadExpenses() {
     try {
-        const response = await fetch(`${API_URL}/expenses`);
-        allExpenses = await response.json();
+        const res = await authFetch(`${API_URL}/expenses`);
+        if (!res) return;
 
+        const data = await res.json();
+
+        // Guard: must be array
+        if (!Array.isArray(data)) {
+            console.error('Expected array, got:', data);
+            document.getElementById('expensesTableBody').innerHTML =
+                '<tr><td colspan="5" class="no-data">Error loading expenses</td></tr>';
+            return;
+        }
+
+        allExpenses = data;
         populateMonthFilter();
-        filterAndDisplayExpenses();
+        filterAndDisplay();
 
-    } catch (error) {
-        console.error('Error loading expenses:', error);
+    } catch (err) {
+        console.error('Error loading expenses:', err);
         document.getElementById('expensesTableBody').innerHTML =
             '<tr><td colspan="5" class="no-data">Error loading expenses</td></tr>';
     }
 }
 
-// Populate month filter dropdown
+// ─── Filter ───────────────────────────────────────────────────────────────────
+
 function populateMonthFilter() {
-    const monthFilter = document.getElementById('filterMonth');
-    const months = new Set();
+    const select = document.getElementById('filterMonth');
+    while (select.options.length > 1) select.remove(1);
 
-    allExpenses.forEach(exp => {
-        const date = new Date(exp.date);
-        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        months.add(monthYear);
-    });
+    const months = new Set(allExpenses.map(e => {
+        const d = new Date(e.date);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }));
 
-    const sortedMonths = Array.from(months).sort().reverse();
-
-    sortedMonths.forEach(monthYear => {
-        const [year, month] = monthYear.split('-');
-        const date = new Date(year, month - 1);
-        const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-        const option = document.createElement('option');
-        option.value = monthYear;
-        option.textContent = monthName;
-        monthFilter.appendChild(option);
+    [...months].sort().reverse().forEach(my => {
+        const [yr, mo] = my.split('-');
+        const label = new Date(yr, mo - 1)
+            .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const opt = document.createElement('option');
+        opt.value = my;
+        opt.textContent = label;
+        select.appendChild(opt);
     });
 }
 
-// Filter and display expenses
-function filterAndDisplayExpenses() {
-    const categoryFilter = document.getElementById('filterCategory').value;
-    const monthFilter = document.getElementById('filterMonth').value;
+function filterAndDisplay() {
+    const cat = document.getElementById('filterCategory').value;
+    const month = document.getElementById('filterMonth').value;
 
-    let filteredExpenses = allExpenses;
-
-    if (categoryFilter !== 'all') {
-        filteredExpenses = filteredExpenses.filter(exp => exp.category === categoryFilter);
+    let list = allExpenses;
+    if (cat !== 'all') {
+        list = list.filter(e => e.category === cat);
     }
-
-    if (monthFilter !== 'all') {
-        filteredExpenses = filteredExpenses.filter(exp => {
-            const expDate = new Date(exp.date);
-            const expMonthYear = `${expDate.getFullYear()}-${String(expDate.getMonth() + 1).padStart(2, '0')}`;
-            return expMonthYear === monthFilter;
+    if (month !== 'all') {
+        list = list.filter(e => {
+            const d = new Date(e.date);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === month;
         });
     }
-
-    displayExpenses(filteredExpenses);
+    displayExpenses(list);
 }
 
-// Display expenses in table
+// ─── Display ──────────────────────────────────────────────────────────────────
+
 function displayExpenses(expenses) {
     const tbody = document.getElementById('expensesTableBody');
-    const totalAmount = document.getElementById('totalAmount');
+    const total = document.getElementById('totalAmount');
 
-    if (expenses.length === 0) {
+    if (!expenses.length) {
         tbody.innerHTML = '<tr><td colspan="5" class="no-data">No expenses found</td></tr>';
-        totalAmount.textContent = 'NPR 0.00';
+        total.textContent = 'NPR 0.00';
         return;
     }
 
-    expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sorted = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+    total.textContent = `NPR ${sorted.reduce((s, e) => s + e.amount, 0).toFixed(2)}`;
 
-    const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    totalAmount.textContent = `NPR ${total.toFixed(2)}`;
-
-    tbody.innerHTML = expenses.map(exp => `
+    tbody.innerHTML = sorted.map(exp => `
         <tr>
             <td>${new Date(exp.date).toLocaleDateString()}</td>
             <td>
-                <span class="category-badge" style="background-color: ${categoryColors[exp.category]}20; color: ${categoryColors[exp.category]}">
+                <span class="category-badge"
+                      style="background:${categoryColors[exp.category]}22;
+                             color:${categoryColors[exp.category]}">
                     ${exp.category}
                 </span>
             </td>
-            <td>${exp.description || '-'}</td>
-            <td style="font-weight: bold; color: #e74c3c;">NPR ${exp.amount.toFixed(2)}</td>
+            <td>${exp.description || '—'}</td>
+            <td style="font-weight:700;color:#e74c3c">NPR ${exp.amount.toFixed(2)}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="btn-edit" onclick="editExpense(${exp.id})">✏️ Edit</button>
+                    <button class="btn-edit"   onclick="editExpense(${exp.id})">✏️ Edit</button>
                     <button class="btn-delete" onclick="showDeleteModal(${exp.id})">🗑️ Delete</button>
                 </div>
             </td>
@@ -122,63 +133,34 @@ function displayExpenses(expenses) {
     `).join('');
 }
 
-// Edit expense
+// ─── CRUD ─────────────────────────────────────────────────────────────────────
+
 function editExpense(id) {
     window.location.href = `addExpenses.html?edit=${id}`;
 }
 
-// Show delete confirmation modal — FIXED: display flex so modal-overlay works
 function showDeleteModal(id) {
     deleteExpenseId = id;
     document.getElementById('deleteModal').style.display = 'flex';
 }
 
-// Delete expense
-async function deleteExpense() {
-    try {
-        const response = await fetch(`${API_URL}/expenses/${deleteExpenseId}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            closeDeleteModal();
-            loadExpenses();
-        } else {
-            alert('Failed to delete expense');
-        }
-
-    } catch (error) {
-        console.error('Error deleting expense:', error);
-        alert('Error connecting to server');
-    }
-}
-
-// Close delete modal
 function closeDeleteModal() {
     document.getElementById('deleteModal').style.display = 'none';
     deleteExpenseId = null;
 }
 
-// Language Toggle
-function setupLangToggle() {
-    document.getElementById('langToggle').addEventListener('click', function () {
-        const currentLang = this.textContent;
-        if (currentLang === 'नेपाली') {
-            this.textContent = 'English';
+async function deleteExpense() {
+    try {
+        const res = await authFetch(`${API_URL}/expenses/${deleteExpenseId}`, {
+            method: 'DELETE'
+        });
+        if (res && res.ok) {
+            closeDeleteModal();
+            loadExpenses();
         } else {
-            this.textContent = 'नेपाली';
+            alert('Failed to delete expense');
         }
-    });
+    } catch {
+        alert('Error connecting to server');
+    }
 }
-
-// All event listeners inside DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function () {
-    loadExpenses();
-
-    document.getElementById('filterCategory').addEventListener('change', filterAndDisplayExpenses);
-    document.getElementById('filterMonth').addEventListener('change', filterAndDisplayExpenses);
-    document.getElementById('confirmDeleteBtn').addEventListener('click', deleteExpense);
-    document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
-
-    setupLangToggle();
-});

@@ -1,6 +1,4 @@
-// API Base URL
-const API_URL = 'http://localhost:5000/api';
-
+// NOTE: API_URL, authFetch, getSession, initPage, logout — all from auth.js
 // Category Colors
 const categoryColors = {
     'Food': '#FF6384',
@@ -12,169 +10,153 @@ const categoryColors = {
     'Bills': '#E74C3C',
     'Others': '#95A5A6'
 };
+let currentBudget = 0;
+let allExpenses   = [];
 
-let currentBudget = 15000;
-let allExpenses = [];
+// ─── Bootstrap ───────────────────────────────────────────────────────────────
 
-// Load reports data
+document.addEventListener('DOMContentLoaded', () => {
+    const session = initPage(); // from auth.js
+    if (!session) return;
+
+    loadReports();
+
+    document.getElementById('saveBudget').addEventListener('click',  saveBudget);
+    document.getElementById('exportCSV').addEventListener('click',   exportCSV);
+    document.getElementById('printReport').addEventListener('click', () => window.print());
+});
+
+// ─── Load ─────────────────────────────────────────────────────────────────────
+
 async function loadReports() {
     try {
-        // Fetch expenses
-        const expensesResponse = await fetch(`${API_URL}/expenses`);
-        allExpenses = await expensesResponse.json();
+        const [expRes, budRes] = await Promise.all([
+            authFetch(`${API_URL}/expenses`),
+            authFetch(`${API_URL}/budget`)
+        ]);
+        if (!expRes || !budRes) return;
 
-        // Fetch budget
-        const budgetResponse = await fetch(`${API_URL}/budget`);
-        const budgetData = await budgetResponse.json();
-        currentBudget = budgetData.budget || 15000;
+        const expData = await expRes.json();
+        const budData = await budRes.json();
 
-        // Update UI
+        // Guard: must be array
+        allExpenses   = Array.isArray(expData) ? expData : [];
+        currentBudget = budData.budget || 0;
+
         document.getElementById('budgetInput').value = currentBudget;
         updateBudgetOverview();
         updateCategoryBreakdown();
         loadCategoryPieChart();
         loadMonthlyBarChart();
 
-    } catch (error) {
-        console.error('Error loading reports:', error);
+    } catch (err) {
+        console.error('Report error:', err);
     }
 }
 
-// Save budget
-document.getElementById('saveBudget').addEventListener('click', async function() {
-    const budgetInput = document.getElementById('budgetInput');
-    const newBudget = parseFloat(budgetInput.value);
+// ─── Budget ───────────────────────────────────────────────────────────────────
 
-    if (isNaN(newBudget) || newBudget <= 0) {
-        document.getElementById('budgetMsg').textContent = 'Please enter a valid budget amount';
-        document.getElementById('budgetMsg').style.color = '#e74c3c';
+async function saveBudget() {
+    const val = parseFloat(document.getElementById('budgetInput').value);
+    const msg = document.getElementById('budgetMsg');
+
+    if (!val || val <= 0) {
+        msg.textContent = 'Please enter a valid budget amount';
+        msg.style.color = '#e74c3c';
         return;
     }
 
     try {
-        const response = await fetch(`${API_URL}/budget`, {
+        const res = await authFetch(`${API_URL}/budget`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ budget: newBudget })
+            body:   JSON.stringify({ budget: val })
         });
 
-        if (response.ok) {
-            currentBudget = newBudget;
-            document.getElementById('budgetMsg').textContent = 'Budget saved successfully!';
-            document.getElementById('budgetMsg').style.color = '#27ae60';
+        if (res && res.ok) {
+            currentBudget   = val;
+            msg.textContent = 'Budget saved successfully!';
+            msg.style.color = '#27ae60';
             updateBudgetOverview();
         } else {
-            document.getElementById('budgetMsg').textContent = 'Failed to save budget';
-            document.getElementById('budgetMsg').style.color = '#e74c3c';
+            msg.textContent = 'Failed to save budget';
+            msg.style.color = '#e74c3c';
         }
-
-    } catch (error) {
-        console.error('Error saving budget:', error);
-        document.getElementById('budgetMsg').textContent = 'Error connecting to server';
-        document.getElementById('budgetMsg').style.color = '#e74c3c';
-    }
-});
-
-// Update budget overview
-function updateBudgetOverview() {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
-    const monthExpenses = allExpenses.filter(exp => {
-        const expDate = new Date(exp.date);
-        return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
-    });
-
-    const totalSpent = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const remaining = currentBudget - totalSpent;
-    const percentage = (totalSpent / currentBudget) * 100;
-
-    document.getElementById('budgetAmount').textContent = `NPR ${currentBudget.toFixed(2)}`;
-    document.getElementById('spentAmount').textContent = `NPR ${totalSpent.toFixed(2)}`;
-    document.getElementById('remainingAmount').textContent = `NPR ${remaining.toFixed(2)}`;
-    document.getElementById('remainingAmount').style.color = remaining >= 0 ? '#27ae60' : '#e74c3c';
-
-    const progressFill = document.getElementById('progressFill');
-    progressFill.style.width = `${Math.min(percentage, 100)}%`;
-    
-    if (percentage > 100) {
-        progressFill.classList.add('over-budget');
-    } else {
-        progressFill.classList.remove('over-budget');
+    } catch {
+        msg.textContent = 'Error connecting to server';
+        msg.style.color = '#e74c3c';
     }
 }
 
-// Update category breakdown
+function getThisMonthExpenses() {
+    const now = new Date();
+    return allExpenses.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+}
+
+function updateBudgetOverview() {
+    const monthExp  = getThisMonthExpenses();
+    const spent     = monthExp.reduce((s, e) => s + e.amount, 0);
+    const remaining = currentBudget - spent;
+    const pct       = currentBudget ? (spent / currentBudget) * 100 : 0;
+
+    document.getElementById('budgetAmount').textContent    = `NPR ${currentBudget.toFixed(2)}`;
+    document.getElementById('spentAmount').textContent     = `NPR ${spent.toFixed(2)}`;
+    document.getElementById('remainingAmount').textContent = `NPR ${remaining.toFixed(2)}`;
+    document.getElementById('remainingAmount').style.color = remaining >= 0 ? '#27ae60' : '#e74c3c';
+
+    const bar       = document.getElementById('progressFill');
+    bar.style.width = `${Math.min(pct, 100)}%`;
+    bar.className   = 'progress-fill' + (pct > 100 ? ' over-budget' : '');
+}
+
 function updateCategoryBreakdown() {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
-    const monthExpenses = allExpenses.filter(exp => {
-        const expDate = new Date(exp.date);
-        return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
-    });
+    const monthExp = getThisMonthExpenses();
+    const totals   = {};
+    monthExp.forEach(e => { totals[e.category] = (totals[e.category] || 0) + e.amount; });
 
-    const categoryTotals = {};
-    monthExpenses.forEach(exp => {
-        categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
-    });
-
-    const totalSpent = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const total     = Object.values(totals).reduce((s, v) => s + v, 0);
     const container = document.getElementById('categoryBreakdown');
 
-    if (Object.keys(categoryTotals).length === 0) {
+    if (!Object.keys(totals).length) {
         container.innerHTML = '<p class="no-data">No data available</p>';
         return;
     }
 
-    container.innerHTML = Object.entries(categoryTotals).map(([category, amount]) => {
-        const percentage = (amount / totalSpent) * 100;
-        return `
-            <div class="category-item">
-                <div class="category-name">${category}</div>
-                <div class="category-bar">
-                    <div class="category-bar-fill" style="width: ${percentage}%; background-color: ${categoryColors[category]}"></div>
-                </div>
-                <div class="category-amount">NPR ${amount.toFixed(2)}</div>
+    container.innerHTML = Object.entries(totals).map(([cat, amt]) => `
+        <div class="category-item">
+            <div class="category-name">${cat}</div>
+            <div class="category-bar">
+                <div class="category-bar-fill"
+                     style="width:${(amt/total*100).toFixed(1)}%;
+                            background:${categoryColors[cat]}"></div>
             </div>
-        `;
-    }).join('');
+            <div class="category-amount">NPR ${amt.toFixed(2)}</div>
+        </div>
+    `).join('');
 }
 
-// Load category pie chart
+// ─── Charts ───────────────────────────────────────────────────────────────────
+
 function loadCategoryPieChart() {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
-    const monthExpenses = allExpenses.filter(exp => {
-        const expDate = new Date(exp.date);
-        return expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear;
-    });
+    const monthExp = getThisMonthExpenses();
+    const totals   = {};
+    monthExp.forEach(e => { totals[e.category] = (totals[e.category] || 0) + e.amount; });
 
-    const categoryTotals = {};
-    monthExpenses.forEach(exp => {
-        categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
-    });
-
-    const labels = Object.keys(categoryTotals);
-    const data = Object.values(categoryTotals);
-    const colors = labels.map(cat => categoryColors[cat]);
+    const labels = Object.keys(totals);
+    if (!labels.length) return;
 
     const ctx = document.getElementById('categoryPieChart').getContext('2d');
-    
-    if (window.categoryPieChartInstance) {
-        window.categoryPieChartInstance.destroy();
-    }
+    if (window.catChart) window.catChart.destroy();
 
-    window.categoryPieChartInstance = new Chart(ctx, {
+    window.catChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: labels,
+            labels,
             datasets: [{
-                data: data,
-                backgroundColor: colors,
+                data: Object.values(totals),
+                backgroundColor: labels.map(l => categoryColors[l]),
                 borderWidth: 2,
                 borderColor: '#fff'
             }]
@@ -183,17 +165,12 @@ function loadCategoryPieChart() {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: {
-                    position: 'bottom',
-                },
+                legend: { position: 'bottom' },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return `${label}: NPR ${value.toFixed(2)} (${percentage}%)`;
+                        label: c => {
+                            const total = c.dataset.data.reduce((a, b) => a + b, 0);
+                            return `${c.label}: NPR ${c.parsed.toFixed(2)} (${(c.parsed/total*100).toFixed(1)}%)`;
                         }
                     }
                 }
@@ -202,42 +179,30 @@ function loadCategoryPieChart() {
     });
 }
 
-// Load monthly bar chart
 function loadMonthlyBarChart() {
-    const last6Months = [];
-    const now = new Date();
-
-    for (let i = 5; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const monthExpenses = allExpenses.filter(exp => {
-            const expDate = new Date(exp.date);
-            return expDate.getMonth() === date.getMonth() && 
-                   expDate.getFullYear() === date.getFullYear();
-        });
-
-        const total = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-        last6Months.push({
-            month: date.toLocaleDateString('en-US', { month: 'short' }),
-            amount: total
-        });
-    }
+    const now    = new Date();
+    const months = Array.from({ length: 6 }, (_, i) => {
+        const d     = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+        const total = allExpenses
+            .filter(e => {
+                const ed = new Date(e.date);
+                return ed.getMonth() === d.getMonth() && ed.getFullYear() === d.getFullYear();
+            })
+            .reduce((s, e) => s + e.amount, 0);
+        return { month: d.toLocaleDateString('en-US', { month: 'short' }), amount: total };
+    });
 
     const ctx = document.getElementById('monthlyBarChart').getContext('2d');
-    
-    if (window.monthlyBarChartInstance) {
-        window.monthlyBarChartInstance.destroy();
-    }
+    if (window.barChart) window.barChart.destroy();
 
-    window.monthlyBarChartInstance = new Chart(ctx, {
+    window.barChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: last6Months.map(m => m.month),
+            labels: months.map(m => m.month),
             datasets: [{
-                label: 'Monthly Expenses',
-                data: last6Months.map(m => m.amount),
-                backgroundColor: '#667eea',
-                borderColor: '#667eea',
-                borderWidth: 1
+                label: 'Expenses',
+                data:  months.map(m => m.amount),
+                backgroundColor: '#667eea'
             }]
         },
         options: {
@@ -246,66 +211,33 @@ function loadMonthlyBarChart() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'NPR ' + value;
-                        }
-                    }
+                    ticks: { callback: v => 'NPR ' + v }
                 }
             },
             plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'NPR ' + context.parsed.y.toFixed(2);
-                        }
-                    }
-                }
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => 'NPR ' + c.parsed.y.toFixed(2) } }
             }
         }
     });
 }
 
-// Export to CSV
-document.getElementById('exportCSV').addEventListener('click', function() {
-    if (allExpenses.length === 0) {
-        alert('No data to export');
-        return;
-    }
+// ─── Export ───────────────────────────────────────────────────────────────────
 
-    let csv = 'Date,Category,Description,Amount\n';
-    allExpenses.forEach(exp => {
-        csv += `${exp.date},${exp.category},"${exp.description || ''}",${exp.amount}\n`;
+function exportCSV() {
+    if (!allExpenses.length) { alert('No data to export'); return; }
+
+    const session   = getSession(); // from auth.js
+    const userLabel = session ? `# User: ${session.fullname || session.username}\n` : '';
+    let csv         = userLabel + 'Date,Category,Description,Amount\n';
+
+    allExpenses.forEach(e => {
+        csv += `${e.date},${e.category},"${e.description || ''}",${e.amount}\n`;
     });
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nepartha_expenses_${new Date().toISOString().split('T')[0]}.csv`;
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = `nepartha_${(session?.username || 'user')}_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
-    window.URL.revokeObjectURL(url);
-});
-
-// Print report
-document.getElementById('printReport').addEventListener('click', function() {
-    window.print();
-});
-
-// Language Toggle (placeholder)
-document.getElementById('langToggle').addEventListener('click', function() {
-    const currentLang = this.textContent;
-    if (currentLang === 'नेपाली') {
-        this.textContent = 'English';
-        // Implement Nepali translations here
-    } else {
-        this.textContent = 'नेपाली';
-        // Implement English translations here
-    }
-});
-
-// Load reports on page load
-document.addEventListener('DOMContentLoaded', loadReports);
+    URL.revokeObjectURL(a.href);
+}
