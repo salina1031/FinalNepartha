@@ -16,10 +16,12 @@
 
 /* ================= BASE RESET ================= */
 * {
+
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: inherit;
+    /* overflow-x: hidden; */
 }
 
 html,
@@ -27,37 +29,40 @@ body {
     font-family: var(--font-main);
     background: var(--bg);
     width: 100%;
-    height: auto;
-    /* height: 100%;  <--- REMOVED to allow scrolling */
+    height: 100%;
+
     color: var(--text-dark);
-    overflow-x: hidden;
 }
 
 /* ================= LOGIN/SIGNUP PAGE STYLES (MOBILE) ================= */
 .auth-page {
     width: 100%;
-    /* height: 100vh; <--- REMOVED */
-    /* overflow: hidden; <--- REMOVED */
+    height: 100vh;
+    overflow: hidden;
 }
 
 .container{
     width: 100%;
-    /* height: 100%; <--- REMOVED */
+    height: 100%;
 }
 .auth-page .container {
     position: relative;
-    /* height: 100vh; <--- REMOVED */
+    height: 100vh;
 }
 
 .container-loginSignup {
+
     width: 100%;
-    /* height: 100%; <--- REMOVED */
+    height: 100%;
+
     background:
         radial-gradient(circle at top right, rgb(101, 101, 236) 0%, transparent 40%),
         radial-gradient(circle at bottom left, red 0%, transparent 40%),
-        rgb(145, 147, 148);
-    padding-bottom: 40px; /* Add padding at bottom */
+        rgb(145, 147, 148)
 }
+
+
+
 
 .logo img {
     position: absolute;
@@ -69,25 +74,19 @@ body {
 }
 
 .card {
-    /* position: absolute; <--- REMOVED */
-    /* top: 53%; <--- REMOVED */
-    /* left: 50%; <--- REMOVED */
-    /* transform: translate(-50%, -50%); <--- REMOVED */
-    
-    position: relative; /* Keeps it in the flow */
+    position: absolute;
+    top: 53%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 90%;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
     max-width: 380px;
-    margin: 100px auto 20px; /* Centered horizontally, margin top clears logo */
-    
-    /* max-height: calc(100vh - 40px); <--- REMOVED */
-    /* overflow-y: auto; <--- REMOVED */
-    
     padding: 20px;
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     text-align: center;
     z-index: 2;
-    background: white;
 }
 
 .card h1 {
@@ -182,6 +181,8 @@ button:hover {
     text-decoration: none;
     font-weight: bold;
 }
+
+
 
 /* ================= SUMMARY (MOBILE) ================= */
 .summary {
@@ -503,17 +504,24 @@ button:hover {
     grid-template-columns: 1fr;
     gap: 1rem;
     margin-bottom: 1.5rem;
+   
+
+    
 }
 
 .chart-container {
     background: white;
     text-align: center;
+   
+   
     padding: 1.2rem;
+    
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
     margin-bottom: 1.5rem;
     border-radius: 25px;
+    
     justify-content: space-evenly;
     box-shadow: 0px 4px 9px 7px rgba(0, 0, 0, 0.1);
 }
@@ -619,6 +627,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
+    
 }
 
 .filter-group label {
@@ -712,11 +721,10 @@ button:hover {
     font-weight: bold;
     color: var(--blue);
 }
+.budget-item{
 
-.budget-item {
     margin: 0.8rem 0;
 }
-
 .report-card.expense .report-card-value {
     color: var(--red);
 }
@@ -790,7 +798,7 @@ button:hover {
     padding: 1rem;
     box-shadow: 0 4px 9px 7px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
-    margin: 1rem 0;
+    margin : 1rem 0;
 }
 
 .table-header {
@@ -1006,7 +1014,7 @@ button:hover {
     top: 0;
     left: 0;
     width: 100%;
-   
+    height: 100%;
     background: rgba(0, 0, 0, 0.6);
     display: none;
     align-items: center;
@@ -1028,7 +1036,7 @@ button:hover {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     position: relative;
     z-index: 10000;
-    
+    max-height: 90vh;
     overflow-y: auto;
 }
 
@@ -1134,7 +1142,6 @@ button:hover {
     .card {
         width: 85%;
         padding: 25px;
-        margin-top: 120px; /* Adjust for larger logo */
     }
 
     .card h1 {
@@ -1158,6 +1165,8 @@ button:hover {
     .summary-box h2 {
         font-size: 1.5rem;
     }
+
+    
 
     /* DESKTOP: Logo(left) | Welcome center big | Buttons right small — one row */
     .navbar {
@@ -1457,7 +1466,7 @@ button:hover {
         grid-template-columns: repeat(4, 1fr);
     }
 
-       /* Table no scroll needed */
+    /* Table no scroll needed */
     .expenses-table {
         min-width: auto;
     }
