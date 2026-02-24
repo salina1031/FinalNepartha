@@ -16,7 +16,6 @@
 
 /* ================= BASE RESET ================= */
 * {
-
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -28,40 +27,37 @@ body {
     font-family: var(--font-main);
     background: var(--bg);
     width: 100%;
-    height: 100%;
-
+    height: auto;
+    /* height: 100%;  <--- REMOVED to allow scrolling */
     color: var(--text-dark);
+    overflow-x: hidden;
 }
 
 /* ================= LOGIN/SIGNUP PAGE STYLES (MOBILE) ================= */
 .auth-page {
     width: 100%;
-    height: 100vh;
-    overflow: hidden;
+    /* height: 100vh; <--- REMOVED */
+    /* overflow: hidden; <--- REMOVED */
 }
 
 .container{
     width: 100%;
-    height: 100%;
+    /* height: 100%; <--- REMOVED */
 }
 .auth-page .container {
     position: relative;
-    height: 100vh;
+    /* height: 100vh; <--- REMOVED */
 }
 
 .container-loginSignup {
-
     width: 100%;
-    height: 100%;
-
+    /* height: 100%; <--- REMOVED */
     background:
         radial-gradient(circle at top right, rgb(101, 101, 236) 0%, transparent 40%),
         radial-gradient(circle at bottom left, red 0%, transparent 40%),
-        rgb(145, 147, 148)
+        rgb(145, 147, 148);
+    padding-bottom: 40px; /* Add padding at bottom */
 }
-
-
-
 
 .logo img {
     position: absolute;
@@ -73,19 +69,25 @@ body {
 }
 
 .card {
-    position: absolute;
-    top: 53%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    /* position: absolute; <--- REMOVED */
+    /* top: 53%; <--- REMOVED */
+    /* left: 50%; <--- REMOVED */
+    /* transform: translate(-50%, -50%); <--- REMOVED */
+    
+    position: relative; /* Keeps it in the flow */
     width: 90%;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
     max-width: 380px;
+    margin: 100px auto 20px; /* Centered horizontally, margin top clears logo */
+    
+    /* max-height: calc(100vh - 40px); <--- REMOVED */
+    /* overflow-y: auto; <--- REMOVED */
+    
     padding: 20px;
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     text-align: center;
     z-index: 2;
+    background: white;
 }
 
 .card h1 {
@@ -181,8 +183,6 @@ button:hover {
     font-weight: bold;
 }
 
-
-
 /* ================= SUMMARY (MOBILE) ================= */
 .summary {
     display: flex;
@@ -237,25 +237,61 @@ button:hover {
     padding: 0.8rem 0;
 }
 
+/* MOBILE: Row1 = Logo(left) + Buttons(right) | Row2 = Welcome centered */
 .nav-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0.5rem 1rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+}
+
+.navbar .logo {
+    flex: 0 0 auto;
 }
 
 .navbar .logo h1 {
     color: var(--blue);
-    font-size: 1.5rem;
-    margin-bottom: 0.2rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.1rem;
 }
 
 .navbar .logo p {
     color: #666;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+}
+
+/* Mobile: nav-actions right side of logo, same row */
+.nav-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Mobile: Welcome full width below, centered */
+.user-welcome {
+    width: 100%;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+    padding: 0.2rem 0;
+    order: 3;
+}
+
+/* Small buttons always */
+.nav-actions button,
+.btn-small {
+    width: auto !important;
+    padding: 0.3rem 0.75rem !important;
+    font-size: 0.78rem !important;
+    border-radius: 5px !important;
+    font-weight: 600 !important;
+    margin-bottom: 0 !important;
 }
 
 .navbar .user-info {
@@ -311,7 +347,7 @@ button:hover {
 .app-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 1rem;
 }
 
 .page-title {
@@ -465,15 +501,21 @@ button:hover {
 .charts-row {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
 .chart-container {
     background: white;
-    border-radius: 10px;
-    padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 1.2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 25px;
+    justify-content: space-evenly;
+    box-shadow: 0px 4px 9px 7px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
@@ -492,13 +534,14 @@ button:hover {
 .form-container {
     max-width: 600px;
     margin: 0 auto;
+    border-radius: 33px;
 }
 
 .form-card {
     background: white;
     border-radius: 10px;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 9px 7px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -554,7 +597,7 @@ button:hover {
     background: white;
     border-radius: 10px;
     padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 9px 7px rgba(0, 0, 0, 0.1);
     margin-bottom: 1.5rem;
 }
 
@@ -582,6 +625,7 @@ button:hover {
     font-size: 0.9rem;
     color: #666;
     font-weight: 500;
+    margin: 0.5rem;
 }
 
 .filter-group input,
@@ -590,6 +634,7 @@ button:hover {
     border: 2px solid #e0e0e0;
     border-radius: 5px;
     font-size: 0.95rem;
+    margin-bottom: 0.5rem;
 }
 
 .filter-actions {
@@ -667,10 +712,11 @@ button:hover {
     font-weight: bold;
     color: var(--blue);
 }
-.budget-item{
 
+.budget-item {
     margin: 0.8rem 0;
 }
+
 .report-card.expense .report-card-value {
     color: var(--red);
 }
@@ -742,8 +788,9 @@ button:hover {
     background: white;
     border-radius: 10px;
     padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 9px 7px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
+    margin: 1rem 0;
 }
 
 .table-header {
@@ -959,7 +1006,7 @@ button:hover {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+   
     background: rgba(0, 0, 0, 0.6);
     display: none;
     align-items: center;
@@ -981,7 +1028,7 @@ button:hover {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     position: relative;
     z-index: 10000;
-    max-height: 90vh;
+    
     overflow-y: auto;
 }
 
@@ -1087,6 +1134,7 @@ button:hover {
     .card {
         width: 85%;
         padding: 25px;
+        margin-top: 120px; /* Adjust for larger logo */
     }
 
     .card h1 {
@@ -1111,15 +1159,15 @@ button:hover {
         font-size: 1.5rem;
     }
 
-    
-
-    /* Navigation */
+    /* DESKTOP: Logo(left) | Welcome center big | Buttons right small — one row */
     .navbar {
-        padding: 1rem 0;
+        padding: 0.8rem 0;
     }
 
     .nav-container {
+        flex-wrap: nowrap;
         padding: 0 2rem;
+        justify-content: space-between;
     }
 
     .navbar .logo h1 {
@@ -1128,6 +1176,22 @@ button:hover {
 
     .navbar .logo p {
         font-size: 0.85rem;
+    }
+
+    .user-welcome {
+        width: auto;
+        flex: 1;
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #222;
+        order: 0;
+        padding: 0;
+    }
+
+    .nav-actions {
+        flex: 0 0 auto;
+        justify-content: flex-end;
     }
 
     .navbar .user-info {
@@ -1393,7 +1457,7 @@ button:hover {
         grid-template-columns: repeat(4, 1fr);
     }
 
-    /* Table no scroll needed */
+       /* Table no scroll needed */
     .expenses-table {
         min-width: auto;
     }

@@ -41,7 +41,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             throw new Error(data.error || 'Login failed');
         }
 
-        // Remember me — save वा clear गर्ने
+        // Remember me — save ki tha cclear garxxa 
         if (remember) {
             localStorage.setItem('nepartha_remembered_user', username);
         } else {
