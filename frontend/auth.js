@@ -4,7 +4,9 @@
  * Provides: API_URL, authFetch, getToken, getSession, initPage, logout
  */
 
-const API_URL = 'https://finalnepartha-2.onrender.com/api';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000/api'
+    : 'https://finalnepartha-2.onrender.com/api';
 
 // ─── Token / Session helpers ──────────────────────────────────────────────────
 
