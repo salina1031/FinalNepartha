@@ -1,6 +1,6 @@
 // signup.js — NepArtha v2 (backend-registered)
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://finalnepartha-2.onrender.com/api';
 
 document.getElementById('signupForm').addEventListener('submit', async function (e) {
     e.preventDefault();

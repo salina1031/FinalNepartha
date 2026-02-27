@@ -1,6 +1,6 @@
 // login.js — NepArtha v2
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://finalnepartha-2.onrender.com/api';
 
 // ─── Page load — fill saved username if remember me was checked ───────────────
 
