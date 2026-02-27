@@ -18,15 +18,31 @@
     <!-- Card -->
     <div class="card">
         <h1>Sign Up</h1>
-        <div id="errorMsg" class="error-message"></div>
-        <div id="successMsg" class="success-message"></div>
 
-        <form class="loginform" id="signupForm" action="login.html">
-            <input class="input-blue" type="text" id="fullname" placeholder="Full Name" required>
-            <input class="input-pink" type="email" id="email" placeholder="Email" required>
-            <input class="input-blue" type="text" id="username" placeholder="Username" required>
-            <input class="input-pink" type="password" id="password" placeholder="Password" required>
-            <input class="input-blue" type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        <form class="loginform" id="signupForm">
+            <input class="input-blue" type="text" id="fullname" 
+                   placeholder="Full Name" autocomplete="name" required>
+            <div id="fullnameError" class="field-error"></div>
+
+            <input class="input-pink" type="email" id="email" 
+                   placeholder="Email" autocomplete="email" required>
+            <div id="emailError" class="field-error"></div>
+
+            <input class="input-blue" type="text" id="username" 
+                   placeholder="Username" autocomplete="username" required>
+            <div id="usernameError" class="field-error"></div>
+
+            <input class="input-pink" type="password" id="password" 
+                   placeholder="Password" autocomplete="new-password" required>
+            <div id="passwordError" class="field-error"></div>
+
+            <input class="input-blue" type="password" id="confirmPassword" 
+                   placeholder="Confirm Password" autocomplete="new-password" required>
+            <div id="confirmError" class="field-error"></div>
+
+            <!-- General messages -->
+            <div id="errorMsg" class="msg-error"></div>
+            <div id="successMsg" class="msg-success"></div>
 
             <button type="submit">Sign Up</button>
 
@@ -35,7 +51,6 @@
             </div>
         </form>
     </div>
-</div>
 </div>
 <script src="signup.js"></script>
 </body>

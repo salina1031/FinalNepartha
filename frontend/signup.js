@@ -1,5 +1,3 @@
-// signup.js — NepArtha v2 (backend-registered)
-
 const API_URL = 'https://finalnepartha-2.onrender.com/api';
 
 document.getElementById('signupForm').addEventListener('submit', async function (e) {
@@ -12,22 +10,38 @@ document.getElementById('signupForm').addEventListener('submit', async function 
     const confirmPassword = document.getElementById('confirmPassword').value;
     const errorEl         = document.getElementById('errorMsg');
     const successEl       = document.getElementById('successMsg');
+    const confirmErr      = document.getElementById('confirmError');
+    const passwordErr     = document.getElementById('passwordError');
     const btn             = this.querySelector('button[type="submit"]');
 
-    errorEl.style.display   = 'none';
-    successEl.style.display = 'none';
+    // सबै error clear गर्नुस्
+    clearErrors();
 
-    // Client-side validation
-    if (password !== confirmPassword) {
-        errorEl.textContent   = 'Passwords do not match!';
-        errorEl.style.display = 'block';
-        return;
+    // Validation
+    let hasError = false;
+
+    if (!fullname) {
+        showFieldError('fullnameError', 'Full name is required');
+        hasError = true;
+    }
+    if (!email) {
+        showFieldError('emailError', 'Email is required');
+        hasError = true;
+    }
+    if (!username) {
+        showFieldError('usernameError', 'Username is required');
+        hasError = true;
     }
     if (password.length < 6) {
-        errorEl.textContent   = 'Password must be at least 6 characters!';
-        errorEl.style.display = 'block';
-        return;
+        showFieldError('passwordError', 'Password must be at least 6 characters');
+        hasError = true;
     }
+    if (password !== confirmPassword) {
+        showFieldError('confirmError', 'Passwords do not match');
+        hasError = true;
+    }
+
+    if (hasError) return;
 
     btn.textContent = 'Creating account…';
     btn.disabled    = true;
@@ -44,17 +58,34 @@ document.getElementById('signupForm').addEventListener('submit', async function 
             throw new Error(data.error || 'Registration failed');
         }
 
-        successEl.textContent = 'Account created successfully! Redirecting...';
-successEl.style.display = 'block';
+        successEl.textContent   = 'Account created successfully! Redirecting...';
+        successEl.style.display = 'block';
 
-setTimeout(() => {
-    window.location.href = 'login.html';
-}, 1500);
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
 
     } catch (err) {
-        errorEl.textContent   = err.message;
+        errorEl.textContent   =  err.message;
         errorEl.style.display = 'block';
         btn.textContent       = 'Sign Up';
         btn.disabled          = false;
     }
 });
+
+function showFieldError(id, message) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.textContent =  message;
+        el.style.display = 'block';
+    }
+}
+
+function clearErrors() {
+    ['fullnameError','emailError','usernameError','passwordError','confirmError'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = ''; el.style.display = 'none'; }
+    });
+    document.getElementById('errorMsg').style.display   = 'none';
+    document.getElementById('successMsg').style.display = 'none';
+}

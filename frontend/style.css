@@ -61,12 +61,44 @@ body {
         rgb(145, 147, 148)
 }
 
+/* ── Signup/Login field errors ── */
+.field-error {
+    display: none;
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin: -0.3rem 0 0.5rem 0.5rem;
+    text-align: left;
+}
+
+.msg-error {
+    display: none;
+    background: #f8d7da;
+    color: #c0392b;
+    border-left: 4px solid #e74c3c;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.msg-success {
+    display: none;
+    background: #d4edda;
+    color: #1e8449;
+    border-left: 4px solid #27ae60;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    text-align: left;
+}
 
 
 
 .logo img {
     position: absolute;
-    width: 80px;
+    width: 70px;
     height: auto;
     z-index: 3;
     top: 10px;
