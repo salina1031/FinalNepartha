@@ -55,8 +55,8 @@ html, body {
     padding: 5rem 1rem 2rem;
     background:
         radial-gradient(ellipse at 80% 10%, rgba(101,101,236,.55) 0%, transparent 55%),
-        radial-gradient(ellipse at 5%  90%, rgba(196,30,58,.50)   0%, transparent 50%),
-        linear-gradient(160deg, #1a1a3e 0%, #2d2d60 50%, #1a1a2e 100%);
+        radial-gradient(ellipse at 10%  80%, rgba(177, 35, 58, 0.5)   0%, transparent 55%),
+        linear-gradient(160deg, #1a1a3e 0%, #2d2d60 50%, #C41E3A 100%);
 }
 
 /* Logo — fixed top-LEFT on auth pages */
@@ -64,8 +64,8 @@ html, body {
     position: fixed;
     top: 14px;
     left: 16px;
-    width: 52px;
-    height: 52px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
     border-radius: 50%;
     border: 2.5px solid rgba(255,255,255,.75);
