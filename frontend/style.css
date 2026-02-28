@@ -56,7 +56,7 @@ html, body {
     background:
         radial-gradient(ellipse at 80% 10%, rgba(101,101,236,.55) 0%, transparent 55%),
         radial-gradient(ellipse at 5%  90%, rgba(196,30,58,.50)   0%, transparent 50%),
-        linear-gradient(160deg, #1a1a3e 0%, #2d2d60 50%, #1a1a2e 100%);
+        linear-gradient(160deg, #1a1a3e 0%, #2d2d60 50%, #C41E3A 100%);
 }
 
 /* Logo — fixed top-LEFT on auth pages */
